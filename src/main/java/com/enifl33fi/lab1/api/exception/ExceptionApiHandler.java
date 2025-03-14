@@ -24,7 +24,9 @@ public class ExceptionApiHandler {
             EmailNotUniqueException.class,
             ConstraintViolationException.class,
             MethodArgumentNotValidException.class,
-            EmailOtpException.class
+            EmailOtpException.class,
+            NotFoundException.class,
+            IllegalStateException.class
     })
     public ResponseEntity<ErrorResponseDto> badRequestHandler(Exception e) {
         return ResponseEntity.badRequest()
