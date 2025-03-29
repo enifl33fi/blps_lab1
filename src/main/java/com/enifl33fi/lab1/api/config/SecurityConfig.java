@@ -43,6 +43,7 @@ public class SecurityConfig implements WebMvcConfigurer {
                                                 AntPathRequestMatcher.antMatcher("/api/auth/register"),
                                                 AntPathRequestMatcher.antMatcher("/api/auth/login"),
                                                 AntPathRequestMatcher.antMatcher("/api/auth/unique"),
+                                                AntPathRequestMatcher.antMatcher("/api/auth/refresh"),
                                                 AntPathRequestMatcher.antMatcher("/error"),
                                                 AntPathRequestMatcher.antMatcher("/swagger-ui/**"),
                                                 AntPathRequestMatcher.antMatcher("/v3/api-docs/**"))

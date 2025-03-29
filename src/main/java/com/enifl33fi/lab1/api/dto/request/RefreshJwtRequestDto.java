@@ -1,5 +1,6 @@
 package com.enifl33fi.lab1.api.dto.request;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,7 +11,9 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Schema(description = "Entity with provided refresh token")
 public class RefreshJwtRequestDto {
+    @Schema(description = "Refresh token of user")
     @NotNull
     private String refreshToken;
 }

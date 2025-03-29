@@ -10,6 +10,8 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class EmailService {
@@ -21,7 +23,11 @@ public class EmailService {
 
     @Async
     public void sendEmail(User user) {
-        EmailOtp emailOtp = emailOtpRepository.findByUser(user).orElse(new EmailOtp(user));
+        EmailOtp emailOtp = new EmailOtp(user);
+        Optional<EmailOtp> emailOtpOptional = emailOtpRepository.findByUser(user);
+
+        emailOtpOptional.ifPresent(otp -> emailOtp.setId(otp.getId()));
+
         emailOtpRepository.save(emailOtp);
 
         SimpleMailMessage email = new SimpleMailMessage();
