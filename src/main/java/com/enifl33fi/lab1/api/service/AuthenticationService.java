@@ -12,7 +12,7 @@ import com.enifl33fi.lab1.api.repository.EmailOtpRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.TransactionStatus;
 
 import javax.security.auth.Subject;
 import javax.security.auth.login.LoginContext;
@@ -27,18 +27,29 @@ public class AuthenticationService {
     private final UserMapper userMapper;
     private final ValidatingService validatingService;
     private final EmailOtpRepository emailOtpRepository;
+    private final TransactionService transactionService;
 
-    @Transactional
     public void register(AuthRequestDto userDto) {
-        validatingService.validateEntity(userDto);
-        if (!isUserUnique(userDto.getEmail())) {
-            throw new EmailNotUniqueException(userDto.getEmail());
+        TransactionStatus transaction = null;
+        try {
+            transaction = transactionService.createTransaction("registerTransaction");
+
+            validatingService.validateEntity(userDto);
+            if (!isUserUnique(userDto.getEmail())) {
+                throw new EmailNotUniqueException(userDto.getEmail());
+            }
+
+            User user = userMapper.mapUserFromAuthDto(userDto);
+            user = userService.saveUser(user);
+
+
+            emailService.sendEmail(user);
+
+            transactionService.commit(transaction);
+        } catch (Exception e) {
+            if (transaction != null) transactionService.rollback(transaction);
+            throw e;
         }
-
-        User user = userMapper.mapUserFromAuthDto(userDto);
-        user = userService.saveUser(user);
-
-        emailService.sendEmail(user);
     }
 
     public void login(AuthRequestDto userDto) {

@@ -38,3 +38,4 @@ out/
 
 ### Spring ###
 application.properties
+/transaction_logs/
