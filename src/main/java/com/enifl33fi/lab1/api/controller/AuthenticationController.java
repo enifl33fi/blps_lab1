@@ -1,8 +1,6 @@
 package com.enifl33fi.lab1.api.controller;
 
 import com.enifl33fi.lab1.api.dto.request.AuthRequestDto;
-import com.enifl33fi.lab1.api.dto.request.RefreshJwtRequestDto;
-import com.enifl33fi.lab1.api.dto.response.AuthResponseDto;
 import com.enifl33fi.lab1.api.service.AuthenticationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -28,9 +26,9 @@ public class AuthenticationController {
             description = "Registration ONLY for users"
     )
     @PostMapping("/register")
-    @ResponseBody
-    public ResponseEntity<AuthResponseDto> register(@RequestBody AuthRequestDto userDto) {
-        return ResponseEntity.ok(authenticationService.register(userDto));
+    public ResponseEntity<Void> register(@RequestBody AuthRequestDto userDto) {
+        authenticationService.register(userDto);
+        return ResponseEntity.ok().build();
     }
 
     @Operation(
@@ -38,9 +36,9 @@ public class AuthenticationController {
             description = "Allows to log in"
     )
     @PostMapping("/login")
-    @ResponseBody
-    public ResponseEntity<AuthResponseDto> login(@RequestBody AuthRequestDto userDto) {
-        return ResponseEntity.ok(authenticationService.login(userDto));
+    public ResponseEntity<Void> login(@RequestBody AuthRequestDto userDto) {
+        authenticationService.login(userDto);
+        return ResponseEntity.ok().build();
     }
 
     @Operation(
@@ -48,30 +46,13 @@ public class AuthenticationController {
             description = "Allows to confirm email by providing otp from message"
     )
     @PostMapping("/confirm/{otp}")
-    @ResponseBody
-    public ResponseEntity<AuthResponseDto> confirm(@PathVariable String otp) {
-        return ResponseEntity.ok(authenticationService.confirmAccount(otp));
+    public ResponseEntity<Void> confirm(@PathVariable String otp) {
+        authenticationService.confirmAccount(otp);
+        return ResponseEntity.ok().build();
     }
 
-    @Operation(
-            summary = "Receiving accept and refresh token",
-            description = "Allows to receive new accept and refresh token"
-    )
-    @PostMapping("/refresh")
-    @ResponseBody
-    public ResponseEntity<AuthResponseDto> getTokens(
-            @RequestBody RefreshJwtRequestDto request) {
-        return ResponseEntity.ok(authenticationService.getTokens(request.getRefreshToken()));
-    }
-
-    @Operation(
-            summary = "Is email unique",
-            description = "Allows to get information about uniqueness of email"
-    )
     @GetMapping("/unique")
-    @ResponseBody
-    public ResponseEntity<Map<String, Boolean>> isUserUnique(
-            @RequestParam("email") String email) {
+    public ResponseEntity<Map<String, Boolean>> isUserUnique(@RequestParam("email") String email) {
         Boolean isUnique = authenticationService.isUserUnique(email);
         return ResponseEntity.ok(Collections.singletonMap("unique", isUnique));
     }
