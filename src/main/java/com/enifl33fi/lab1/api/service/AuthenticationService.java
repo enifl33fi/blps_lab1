@@ -11,12 +11,16 @@ import com.enifl33fi.lab1.api.model.user.User;
 import com.enifl33fi.lab1.api.repository.EmailOtpRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.security.auth.Subject;
-import javax.security.auth.login.LoginContext;
-import javax.security.auth.login.LoginException;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +31,8 @@ public class AuthenticationService {
     private final UserMapper userMapper;
     private final ValidatingService validatingService;
     private final EmailOtpRepository emailOtpRepository;
+    @Autowired
+    private AuthenticationManager authenticationManager;
 
     @Transactional
     public void register(AuthRequestDto userDto) {
@@ -43,16 +49,12 @@ public class AuthenticationService {
 
     public void login(AuthRequestDto userDto) {
         validatingService.validateEntity(userDto);
-
         try {
-            LoginContext loginContext = new LoginContext("YourAppLogin",
-                    new UserCallbackHandler(userDto.getEmail(), userDto.getPassword()));
-            loginContext.login();
-
-            Subject subject = loginContext.getSubject();
-            log.info("User {} authenticated via JAAS", userDto.getEmail());
-
-        } catch (LoginException e) {
+            Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(userDto.getEmail(), userDto.getPassword())
+            );
+            log.info("User {} authenticated via Spring Security", userDto.getEmail());
+        } catch (AuthenticationException e) {
             throw new RuntimeException("Login failed: " + e.getMessage());
         }
     }

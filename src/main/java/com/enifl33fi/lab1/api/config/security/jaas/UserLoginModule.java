@@ -64,7 +64,7 @@ public class UserLoginModule implements LoginModule {
         if (!succeeded) return false;
 
         subject.getPrincipals().add(new JaasPrincipal(email));
-        subject.getPrincipals().add(new JaasPrincipal("ROLE_" + authenticatedUser.getRole().name()));
+        subject.getPrincipals().add(new RolePrincipal(authenticatedUser.getRole().name()));
         return true;
     }
 

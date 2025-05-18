@@ -13,6 +13,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
+import jakarta.annotation.PostConstruct;
 
 import java.util.List;
 
@@ -52,10 +53,12 @@ public class SecurityConfigFilterChain {
                         .requestMatchers(WHITE_LIST_URL).permitAll()
                         .requestMatchers(
                                 AntPathRequestMatcher.antMatcher("/api/auth/confirm/**"),
-                                AntPathRequestMatcher.antMatcher("/api/mail/**"))
-                        .hasRole("PENDING_USER")
-                        .anyRequest()
-                        .hasRole("USER"))
+                                AntPathRequestMatcher.antMatcher("/api/mail/**")
+                        ).hasRole("PENDING_USER")
+                        .requestMatchers(
+                                new AntPathRequestMatcher("/api/offers/**", "POST")
+                        ).hasRole("ADMIN")
+                        .anyRequest().hasRole("USER"))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .httpBasic(Customizer.withDefaults())
                 .authenticationManager(authenticationManager);
