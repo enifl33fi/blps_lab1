@@ -21,7 +21,6 @@ public class EmailService {
     @Value("${spring.mail.username}")
     private String fromMail;
 
-    @Async
     public void sendEmail(User user) {
         EmailOtp emailOtp = new EmailOtp(user);
         Optional<EmailOtp> emailOtpOptional = emailOtpRepository.findByUser(user);
@@ -36,6 +35,11 @@ public class EmailService {
         email.setSubject("Confirmation code");
         email.setText(emailOtp.getConfirmationToken());
 
-        javaMailSender.send(email);
+        sendMessage(email);
+    }
+
+    @Async
+    protected void sendMessage(SimpleMailMessage message) {
+        javaMailSender.send(message);
     }
 }
