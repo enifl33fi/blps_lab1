@@ -38,3 +38,7 @@ out/
 
 ### Spring ###
 application.properties
+/transaction_logs/
+
+# Ignore Gradle build output directory
+build
