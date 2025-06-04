@@ -14,6 +14,6 @@ import lombok.NoArgsConstructor;
 @Schema(description = "Entity with info about requested subscription")
 public class SubscribeRequestDto {
     @Schema(description = "Duration of requested subscription")
-    @Min(value = 1, message = "Duration must be at least 1 month")
+    @Min(value = 0, message = "Duration must be at least 1 month")  //TODO: Для тестов
     private int durationMonths;
 }

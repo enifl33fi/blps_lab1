@@ -1,0 +1,13 @@
+version: "3.9"
+services:
+  activemq:
+    image: rmohr/activemq:latest
+    ports:
+      - "1883:1883"     # MQTT
+      - "61616:61616"   # JMS
+      - "8161:8161"     # Web-консоль
+    environment:
+      - ACTIVEMQ_ADMIN_LOGIN=admin
+      - ACTIVEMQ_ADMIN_PASSWORD=admin
+    volumes:
+      - ./activemq.xml:/opt/activemq/conf/activemq.xml

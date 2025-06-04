@@ -28,6 +28,9 @@ public class Subscription {
     @JoinColumn(name = "offer_id", nullable = false)
     private Offer offer;
 
+    @Enumerated(EnumType.STRING)
+    private SubscriptionStatus status;
+
     @Column(nullable = false)
     private LocalDateTime startDate;
 

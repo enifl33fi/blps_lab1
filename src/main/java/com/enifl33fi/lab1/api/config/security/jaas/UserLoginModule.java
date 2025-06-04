@@ -1,10 +1,16 @@
 package com.enifl33fi.lab1.api.config.security.jaas;
 
+import com.enifl33fi.lab1.api.model.user.User;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.context.ApplicationContext;
+
 import javax.security.auth.Subject;
-import javax.security.auth.callback.*;
-import javax.security.auth.login.*;
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.NameCallback;
+import javax.security.auth.callback.PasswordCallback;
+import javax.security.auth.login.FailedLoginException;
+import javax.security.auth.login.LoginException;
 import javax.security.auth.spi.LoginModule;
 import java.util.Map;
 
@@ -16,7 +22,7 @@ public class UserLoginModule implements LoginModule {
     private String email;
     private String password;
     private boolean succeeded = false;
-    private com.enifl33fi.lab1.api.model.user.User authenticatedUser;
+    private User authenticatedUser;
 
     @Override
     public void initialize(Subject subject, CallbackHandler callbackHandler,

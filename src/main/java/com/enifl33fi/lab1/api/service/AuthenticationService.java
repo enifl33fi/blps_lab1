@@ -1,6 +1,5 @@
 package com.enifl33fi.lab1.api.service;
 
-import com.enifl33fi.lab1.api.config.security.jaas.UserCallbackHandler;
 import com.enifl33fi.lab1.api.dto.request.AuthRequestDto;
 import com.enifl33fi.lab1.api.exception.EmailNotUniqueException;
 import com.enifl33fi.lab1.api.exception.EmailOtpException;
@@ -11,16 +10,12 @@ import com.enifl33fi.lab1.api.model.user.User;
 import com.enifl33fi.lab1.api.repository.EmailOtpRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.TransactionStatus;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -32,8 +27,8 @@ public class AuthenticationService {
     private final ValidatingService validatingService;
     private final EmailOtpRepository emailOtpRepository;
     private final TransactionService transactionService;
-    @Autowired
-    private AuthenticationManager authenticationManager;
+    private final AuthenticationManager authenticationManager;
+    private final MqttService mqttService;
 
     public void register(AuthRequestDto userDto) {
         TransactionStatus transaction = null;
@@ -48,12 +43,15 @@ public class AuthenticationService {
             User user = userMapper.mapUserFromAuthDto(userDto);
             user = userService.saveUser(user);
 
-
-            emailService.sendEmail(user);
-
+            EmailOtp emailOtp = emailService.createEmailOtp(user);
             transactionService.commit(transaction);
+
+            mqttService.sendEmailOtpRequest(user.getEmail(), emailOtp.getConfirmationToken());
         } catch (Exception e) {
-            if (transaction != null) transactionService.rollback(transaction);
+            if (transaction != null && !transaction.isCompleted()) {
+                transactionService.rollback(transaction);
+            }
+
             throw e;
         }
     }
@@ -62,7 +60,7 @@ public class AuthenticationService {
         validatingService.validateEntity(userDto);
         try {
             Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(userDto.getEmail(), userDto.getPassword())
+                    new UsernamePasswordAuthenticationToken(userDto.getEmail(), userDto.getPassword())
             );
             log.info("User {} authenticated via Spring Security", userDto.getEmail());
         } catch (AuthenticationException e) {

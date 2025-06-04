@@ -6,11 +6,14 @@ import com.enifl33fi.lab1.api.exception.NotFoundException;
 import com.enifl33fi.lab1.api.mapper.OfferMapper;
 import com.enifl33fi.lab1.api.model.offers.Offer;
 import com.enifl33fi.lab1.api.model.offers.Subscription;
+import com.enifl33fi.lab1.api.model.offers.SubscriptionStatus;
 import com.enifl33fi.lab1.api.model.user.User;
 import com.enifl33fi.lab1.api.repository.OfferRepository;
 import com.enifl33fi.lab1.api.repository.SubscriptionRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.TransactionStatus;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -24,6 +27,9 @@ public class SubscriptionService {
     private final OfferRepository offerRepository;
     private final OfferMapper offerMapper;
     private final ValidatingService validatingService;
+    private final TransactionService transactionService;
+    private final MqttService mqttService;
+    private final StatisticService statisticService;
 
     public List<OfferResponseDto> getOffers(User user) {
         List<Offer> offers = offerRepository.findAll();
@@ -40,12 +46,48 @@ public class SubscriptionService {
                 .collect(Collectors.toList());
     }
 
+    public void processExpiredSubscriptions() {
+        TransactionStatus transaction = null;
+        try {
+            transaction = transactionService.createTransaction("registerTransaction");
+
+            List<Subscription> expiredSubscriptions = subscriptionRepository.findExpiredActiveSubscriptions(LocalDateTime.now());
+
+            for (Subscription subscription : expiredSubscriptions) {
+                subscription.setStatus(SubscriptionStatus.EXPIRED);
+                subscriptionRepository.save(subscription);
+                mqttService.sendEmailExpiredRequest(
+                        subscription.getUser().getEmail(),
+                        String.format(
+                                "Dear %s,\nYour subscription to '%s' has expired on %s.",
+                                subscription.getUser().getEmail(),
+                                subscription.getOffer().getName(),
+                                subscription.getEndDate().toString()
+                        )
+                );
+            }
+            transactionService.commit(transaction);
+        } catch (Exception e) {
+            if (transaction != null && !transaction.isCompleted()) {
+                transactionService.rollback(transaction);
+            }
+
+            throw e;
+        }
+    }
+
+    @Scheduled(fixedRate = 5 * 60 * 1000)
+    public void checkExpiredSubscriptions() {
+        processExpiredSubscriptions();
+    }
+
     public OfferResponseDto getOfferById(Long id, User user) {
         Offer offer = offerRepository.findById(id).orElseThrow(() -> new NotFoundException("Offer"));
         Optional<Subscription> subscriptionOpt = subscriptionRepository.findByUserAndOffer(user, offer);
 
         return offerMapper.mapToOfferResponseDto(offer, subscriptionOpt);
     }
+
 
     public void subscribeToOffer(Long id, User user, SubscribeRequestDto request) {
         validatingService.validateEntity(request);
@@ -62,10 +104,13 @@ public class SubscriptionService {
                 .user(user)
                 .offer(offer)
                 .startDate(now)
+                .status(SubscriptionStatus.ACTIVE)
                 .endDate(now.plusMonths(request.getDurationMonths()))
                 .build();
 
         subscriptionRepository.save(subscription);
+
+        statisticService.saveSubscriptionStatistic(offer.getName(), user.getEmail());
     }
 
     public void unsubscribeFromOffer(Long id, User user) {
