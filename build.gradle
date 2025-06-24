@@ -21,6 +21,7 @@ configurations {
 
 repositories {
     mavenCentral()
+    maven { url 'https://repo.maven.apache.org/maven2' }
 }
 
 dependencies {
@@ -32,6 +33,13 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0'
     implementation 'com.atomikos:transactions-spring-boot3-starter:6.0.0'
+
+    // Camunda BPM dependencies
+    implementation 'org.camunda.bpm.springboot:camunda-bpm-spring-boot-starter:7.21.0'
+    implementation 'org.camunda.bpm.springboot:camunda-bpm-spring-boot-starter-webapp:7.21.0'
+    implementation 'org.camunda.bpm.springboot:camunda-bpm-spring-boot-starter-rest:7.21.0'
+    implementation 'org.camunda.bpm:camunda-engine-plugin-spin:7.21.0'
+    implementation 'org.camunda.spin:camunda-spin-dataformat-json-jackson:1.18.0'
 
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
@@ -53,4 +61,8 @@ configurations {
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+tasks.named('bootJar') {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }

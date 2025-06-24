@@ -1,0 +1,33 @@
+{
+  "components": [
+    {
+      "label": "Otp",
+      "type": "textfield",
+      "layout": {
+        "row": "Row_03pr26j",
+        "columns": null
+      },
+      "id": "Field_1wdsxk3",
+      "key": "otp"
+    },
+    {
+      "label": "Continue",
+      "action": "submit",
+      "type": "button",
+      "layout": {
+        "row": "Row_11o20f2",
+        "columns": null
+      },
+      "id": "Field_0oqnlhq"
+    }
+  ],
+  "type": "default",
+  "id": "Form_0ssrxmd",
+  "exporter": {
+    "name": "Camunda Modeler",
+    "version": "5.36.1"
+  },
+  "executionPlatform": "Camunda Platform",
+  "executionPlatformVersion": "7.23.0",
+  "schemaVersion": 18
+}

@@ -1,7 +1,11 @@
 package com.enifl33fi.lab1.api.controller;
 
 import com.enifl33fi.lab1.api.dto.request.AuthRequestDto;
+import com.enifl33fi.lab1.api.model.security.EmailOtp;
+import com.enifl33fi.lab1.api.model.user.User;
+import com.enifl33fi.lab1.api.repository.EmailOtpRepository;
 import com.enifl33fi.lab1.api.service.AuthenticationService;
+import com.enifl33fi.lab1.api.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +14,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
+import java.util.HashMap;
 
 @Tag(
         name = "Authentication controller",
@@ -20,6 +26,8 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class AuthenticationController {
     private final AuthenticationService authenticationService;
+    private final EmailOtpRepository emailOtpRepository;
+    private final UserService userService;
 
     @Operation(
             summary = "User registration",
@@ -55,5 +63,30 @@ public class AuthenticationController {
     public ResponseEntity<Map<String, Boolean>> isUserUnique(@RequestParam("email") String email) {
         Boolean isUnique = authenticationService.isUserUnique(email);
         return ResponseEntity.ok(Collections.singletonMap("unique", isUnique));
+    }
+
+    @GetMapping("/otp/{email}")
+    public ResponseEntity<Map<String, Object>> getOtpForEmail(@PathVariable String email) {
+        try {
+            // Find user by email first
+            User user = userService.loadUserByUsername(email);
+            // Then find OTP for this user
+            Optional<EmailOtp> emailOtp = emailOtpRepository.findByUser(user);
+            
+            Map<String, Object> response = new HashMap<>();
+            if (emailOtp.isPresent()) {
+                response.put("otp", emailOtp.get().getConfirmationToken());
+                response.put("email", email);
+                response.put("message", "OTP found");
+            } else {
+                response.put("message", "No OTP found for this email");
+            }
+            
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("error", e.getMessage());
+            return ResponseEntity.badRequest().body(response);
+        }
     }
 }

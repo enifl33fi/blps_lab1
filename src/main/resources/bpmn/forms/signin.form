@@ -1,0 +1,64 @@
+{
+  "components": [
+    {
+      "label": "Email",
+      "type": "textfield",
+      "layout": {
+        "row": "Row_0gfd28l",
+        "columns": null
+      },
+      "id": "Field_1hwzzdt",
+      "key": "email"
+    },
+    {
+      "label": "Password",
+      "type": "textfield",
+      "layout": {
+        "row": "Row_16wabea",
+        "columns": null
+      },
+      "id": "Field_1i66to0",
+      "key": "password"
+    },
+    {
+      "label": "Login or register",
+      "values": [
+        {
+          "label": "Login",
+          "value": "login"
+        },
+        {
+          "label": "Register",
+          "value": "register"
+        }
+      ],
+      "type": "select",
+      "layout": {
+        "row": "Row_1pyur87",
+        "columns": null
+      },
+      "id": "Field_0afu7jw",
+      "key": "action",
+      "defaultValue": "login"
+    },
+    {
+      "label": "Continue",
+      "action": "submit",
+      "type": "button",
+      "layout": {
+        "row": "Row_0luznh9",
+        "columns": null
+      },
+      "id": "Field_04nxmm8"
+    }
+  ],
+  "type": "default",
+  "id": "Form_0eb1qqa",
+  "exporter": {
+    "name": "Camunda Modeler",
+    "version": "5.36.1"
+  },
+  "executionPlatform": "Camunda Platform",
+  "executionPlatformVersion": "7.23.0",
+  "schemaVersion": 18
+}

@@ -26,13 +26,13 @@ import java.util.Map;
 public class PsqlDataSourceConfig {
     private final JpaVendorAdapter jpaVendorAdapter;
 
-    @Value("${db.url}")
+    @Value("${spring.datasource.url}")
     String dbUrl;
 
-    @Value("${db.username}")
+    @Value("${spring.datasource.username}")
     String dbUsername;
 
-    @Value("${db.password}")
+    @Value("${spring.datasource.password}")
     String dbPassword;
 
 

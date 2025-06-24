@@ -1,6 +1,5 @@
 package com.enifl33fi.lab1.api.service;
 
-import com.enifl33fi.lab1.api.config.security.jaas.UserCallbackHandler;
 import com.enifl33fi.lab1.api.dto.request.AuthRequestDto;
 import com.enifl33fi.lab1.api.exception.EmailNotUniqueException;
 import com.enifl33fi.lab1.api.exception.EmailOtpException;
@@ -16,11 +15,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.TransactionStatus;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
