@@ -27,7 +27,11 @@ public class SecurityConfigFilterChain {
             "/notify/**",
             "/app/**",
             "/test/**",
-            "/app.js"
+            "/test_api.html",
+            "/app.js",
+            "/index.html",
+            "/camunda/**",
+            "/**"
     };
 
     private final AuthenticationManager authenticationManager;
