@@ -1,8 +1,10 @@
 package com.enifl33fi.lab1.api.delegate;
 
+import com.enifl33fi.lab1.api.model.security.EmailOtp;
 import com.enifl33fi.lab1.api.model.user.User;
 import com.enifl33fi.lab1.api.service.EmailService;
 import com.enifl33fi.lab1.api.service.UserService;
+import com.enifl33fi.lab1.api.service.MqttService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
@@ -16,6 +18,7 @@ public class SendOtpDelegate implements JavaDelegate {
 
     private final EmailService emailService;
     private final UserService userService;
+    private final MqttService mqttService;
 
     @Override
     public void execute(DelegateExecution execution) throws Exception {
@@ -28,8 +31,9 @@ public class SendOtpDelegate implements JavaDelegate {
         }
 
         User user = userService.loadUserByUsername(email);
-        emailService.sendEmail(user);
+        EmailOtp emailOtp = emailService.createEmailOtp(user);
+        mqttService.sendEmailOtpRequest(user.getEmail(), emailOtp.getConfirmationToken());
 
-        log.info("SendOtpDelegate: Email с OTP отправлен на {}", email);
+        log.info("SendOtpDelegate: Email с OTP отправлен на {} через очередь", email);
     }
 } 

@@ -31,6 +31,9 @@ spring:
           auth: true
           starttls:
             enable: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
 
 # Camunda BPM configuration
 camunda:
@@ -71,6 +74,37 @@ camunda:
       enabled: true
       enabled-for-custom-code: true
 
+# ActiveMQ configuration
+activemq:
+  broker-url: tcp://localhost:61616
+  user: admin
+  password: admin
+  pool:
+    enabled: false
+
+# JMS configuration
+jms:
+  cache:
+    enabled: false
+
+# Atomikos configuration
+atomikos:
+  properties:
+    max-timeout: 900000
+  log-base-dir: ./transaction_logs
+
+# MQTT configuration
+mqtt:
+  broker:
+    url: tcp://localhost:1883
+
+# YTsaurus configuration
+ytsaurus:
+  table: //home/statistics
+  cluster: localhost:8000
+  endpoint: localhost:8001
+  token: ""
+
 # Admin user configuration
 admin:
   email: admin@example.com
@@ -83,6 +117,8 @@ server:
 # Logging configuration
 logging:
   level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
     com.enifl33fi.lab1: DEBUG
     org.camunda.bpm: DEBUG
     org.springframework.security: DEBUG 
