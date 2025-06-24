@@ -95,78 +95,84 @@
     </div>
 </div>
 <script>
-const apiBase = '/api';
+    const apiBase = '/api/process';
 
-function showResult(message, type = 'success') {
-    const result = document.getElementById('result');
-    result.className = `alert alert-${type}`;
-    result.textContent = message;
-    result.classList.remove('d-none');
-}
+    function showResult(message, type = 'success') {
+        const result = document.getElementById('result');
+        result.className = `alert alert-${type}`;
+        result.textContent = message;
+        result.classList.remove('d-none');
+    }
 
-document.getElementById('registerForm').onsubmit = async (e) => {
-    e.preventDefault();
-    const email = document.getElementById('regEmail').value;
-    const password = document.getElementById('regPassword').value;
-    try {
-        const res = await fetch(`${apiBase}/auth/register`, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({email, password})
-        });
-        const data = await res.json();
-        if (res.ok) showResult('Регистрация успешна! Проверьте почту для OTP.');
-        else showResult(data.message || 'Ошибка регистрации', 'danger');
-    } catch (err) { showResult('Ошибка сети', 'danger'); }
-};
+    document.getElementById('registerForm').onsubmit = async (e) => {
+        e.preventDefault();
+        try {
+            const res = await fetch(`${apiBase}/start`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: ''
+            });
+            const data = await res.json();
+            if (res.ok) showResult('Регистрация успешна! Проверьте почту для OTP.');
+            else showResult(data.message || 'Ошибка регистрации', 'danger');
+        } catch (err) {
+            showResult('Ошибка сети', 'danger');
+        }
+    };
 
-document.getElementById('loginForm').onsubmit = async (e) => {
-    e.preventDefault();
-    const email = document.getElementById('loginEmail').value;
-    const password = document.getElementById('loginPassword').value;
-    try {
-        const res = await fetch(`${apiBase}/auth/login`, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({email, password})
-        });
-        const data = await res.json();
-        if (res.ok) showResult('Вход выполнен!');
-        else showResult(data.message || 'Ошибка входа', 'danger');
-    } catch (err) { showResult('Ошибка сети', 'danger'); }
-};
+    document.getElementById('loginForm').onsubmit = async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('loginEmail').value;
+        const password = document.getElementById('loginPassword').value;
+        try {
+            const res = await fetch(`${apiBase}/auth`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({email, password, action: 'login'})
+            });
+            const data = await res.json();
+            if (res.ok) showResult('Вход выполнен!');
+            else showResult(data.message || 'Ошибка входа', 'danger');
+        } catch (err) {
+            showResult('Ошибка сети', 'danger');
+        }
+    };
 
-document.getElementById('otpForm').onsubmit = async (e) => {
-    e.preventDefault();
-    const otp = document.getElementById('otp').value;
-    try {
-        const res = await fetch(`${apiBase}/auth/confirm`, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({otp})
-        });
-        const data = await res.json();
-        if (res.ok) showResult('OTP подтвержден!');
-        else showResult(data.message || 'Ошибка подтверждения', 'danger');
-    } catch (err) { showResult('Ошибка сети', 'danger'); }
-};
+    document.getElementById('otpForm').onsubmit = async (e) => {
+        e.preventDefault();
+        const otp = document.getElementById('otp').value;
+        try {
+            const res = await fetch(`${apiBase}/auth/confirm`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({otp})
+            });
+            const data = await res.json();
+            if (res.ok) showResult('OTP подтвержден!');
+            else showResult(data.message || 'Ошибка подтверждения', 'danger');
+        } catch (err) {
+            showResult('Ошибка сети', 'danger');
+        }
+    };
 
-document.getElementById('subscribeForm').onsubmit = async (e) => {
-    e.preventDefault();
-    const id = document.getElementById('offerId').value;
-    const durationInMonths = document.getElementById('duration').value;
-    const action = document.getElementById('action').value;
-    try {
-        const res = await fetch(`${apiBase}/process/subscribe`, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({id, durationInMonths, action})
-        });
-        const data = await res.json();
-        if (res.ok) showResult('Операция выполнена!');
-        else showResult(data.message || 'Ошибка операции', 'danger');
-    } catch (err) { showResult('Ошибка сети', 'danger'); }
-};
+    document.getElementById('subscribeForm').onsubmit = async (e) => {
+        e.preventDefault();
+        const id = document.getElementById('offerId').value;
+        const durationInMonths = document.getElementById('duration').value;
+        const action = document.getElementById('action').value;
+        try {
+            const res = await fetch(`${apiBase}/process/subscribe`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({id, durationInMonths, action})
+            });
+            const data = await res.json();
+            if (res.ok) showResult('Операция выполнена!');
+            else showResult(data.message || 'Ошибка операции', 'danger');
+        } catch (err) {
+            showResult('Ошибка сети', 'danger');
+        }
+    };
 </script>
 </body>
 </html> 

@@ -19,17 +19,17 @@ public class UnsubscribeDelegate implements JavaDelegate {
     @Override
     public void execute(DelegateExecution execution) throws Exception {
         log.info("Starting unsubscription process for execution: {}", execution.getId());
-        
+
         // Get form data from process variables
-        Long offerId = Long.valueOf((String) execution.getVariable("id"));
-        String userEmail = (String) execution.getVariable("userEmail");
-        
+        Integer offerId = (Integer) execution.getVariable("id");
+        String userEmail = (String) execution.getVariable("email");
+
         // Get user from database
         var user = userService.loadUserByUsername(userEmail);
-        
+
         // Unsubscribe from offer
-        subscriptionService.unsubscribeFromOffer(offerId, user);
-        
+        subscriptionService.unsubscribeFromOffer(offerId.longValue(), user);
+
         log.info("Unsubscription completed for user: {} from offer: {}", userEmail, offerId);
     }
 } 

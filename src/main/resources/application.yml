@@ -4,9 +4,9 @@ spring:
   
   # Database configuration
   datasource:
-    url: jdbc:postgresql://localhost:5432/blps
+    url: jdbc:postgresql://localhost:5432/blps2
     username: postgres
-    password: postgres
+    password: password
     driver-class-name: org.postgresql.Driver
   
   # JPA configuration
@@ -23,8 +23,8 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: ${MAIL_USERNAME:email@email.com}
-    password: ${MAIL_PASSWORD:pass}
+    username: ${MAIL_USERNAME:user}
+    password: ${MAIL_PASSWORD:password}
     properties:
       mail:
         smtp:
@@ -38,6 +38,18 @@ spring:
 # Camunda BPM configuration
 camunda:
   bpm:
+    admin-user:
+      id: admin
+      password: admin
+      firstName: Admin
+    filter:
+      create: All tasks
+    form:
+      enabled: true
+      resource-path: classpath:forms/
+    generic-properties:
+      properties:
+        historyTimeToLive: P1D
     # Enable Camunda REST API
     rest:
       enabled: true
@@ -121,4 +133,4 @@ logging:
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
     com.enifl33fi.lab1: DEBUG
     org.camunda.bpm: DEBUG
-    org.springframework.security: DEBUG 
+    org.springframework.security: DEBUG

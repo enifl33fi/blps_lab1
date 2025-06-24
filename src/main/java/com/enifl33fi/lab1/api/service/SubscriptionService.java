@@ -11,7 +11,6 @@ import com.enifl33fi.lab1.api.model.user.User;
 import com.enifl33fi.lab1.api.repository.OfferRepository;
 import com.enifl33fi.lab1.api.repository.SubscriptionRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.TransactionStatus;
 
@@ -76,7 +75,6 @@ public class SubscriptionService {
         }
     }
 
-    @Scheduled(fixedRate = 5 * 60 * 1000)
     public void checkExpiredSubscriptions() {
         processExpiredSubscriptions();
     }

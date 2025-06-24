@@ -20,23 +20,23 @@ public class SubscribeDelegate implements JavaDelegate {
     @Override
     public void execute(DelegateExecution execution) throws Exception {
         log.info("Starting subscription process for execution: {}", execution.getId());
-        
+
         // Get form data from process variables
-        Long offerId = Long.valueOf((String) execution.getVariable("id"));
-        Integer durationMonths = Integer.valueOf((String) execution.getVariable("durationInMonths"));
-        String userEmail = (String) execution.getVariable("userEmail");
-        
+        Integer offerId = (Integer) execution.getVariable("id");
+        Integer durationMonths = (Integer) execution.getVariable("durationInMonths");
+        String userEmail = (String) execution.getVariable("email");
+
         // Get user from database
         var user = userService.loadUserByUsername(userEmail);
-        
+
         // Create subscription request
         SubscribeRequestDto request = SubscribeRequestDto.builder()
                 .durationMonths(durationMonths)
                 .build();
-        
+
         // Subscribe to offer
-        subscriptionService.subscribeToOffer(offerId, user, request);
-        
+        subscriptionService.subscribeToOffer(offerId.longValue(), user, request);
+
         log.info("Subscription completed for user: {} to offer: {}", userEmail, offerId);
     }
 } 

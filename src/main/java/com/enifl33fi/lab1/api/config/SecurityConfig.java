@@ -1,10 +1,7 @@
 package com.enifl33fi.lab1.api.config;
 
 import com.enifl33fi.lab1.api.service.UserService;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.*;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -21,6 +18,7 @@ import java.util.List;
 @Configuration
 @EnableMethodSecurity
 @EnableAsync
+@EnableAspectJAutoProxy
 public class SecurityConfig {
     private final UserService userService;
 
