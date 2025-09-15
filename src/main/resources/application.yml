@@ -1,0 +1,88 @@
+spring:
+  application:
+    name: blps-lab1-camunda
+  
+  # Database configuration
+  datasource:
+    url: jdbc:postgresql://localhost:5432/blps
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+  
+  # JPA configuration
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+  
+  # Mail configuration
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME:email@email.com}
+    password: ${MAIL_PASSWORD:pass}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+# Camunda BPM configuration
+camunda:
+  bpm:
+    # Enable Camunda REST API
+    rest:
+      enabled: true
+    
+    # Database configuration for Camunda
+    database:
+      schema-update: true
+      type: postgres
+    
+    # Standalone configuration
+    standalone:
+      enabled: true
+    
+    # Webapp configuration
+    webapp:
+      application-path: /camunda
+    
+    # Default job executor
+    default-job-executor:
+      enabled: true
+      max-jobs-per-acquisition: 3
+      wait-time-in-millis: 5000
+      max-wait: 1000
+    
+    # Metrics configuration
+    metrics:
+      enabled: true
+    
+    # History configuration
+    history-level: full
+    
+    # Authorization configuration
+    authorization:
+      enabled: true
+      enabled-for-custom-code: true
+
+# Admin user configuration
+admin:
+  email: admin@example.com
+  password: admin123
+
+# Server configuration
+server:
+  port: 8080
+
+# Logging configuration
+logging:
+  level:
+    com.enifl33fi.lab1: DEBUG
+    org.camunda.bpm: DEBUG
+    org.springframework.security: DEBUG 

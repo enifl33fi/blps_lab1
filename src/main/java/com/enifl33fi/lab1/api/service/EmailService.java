@@ -4,6 +4,7 @@ import com.enifl33fi.lab1.api.model.security.EmailOtp;
 import com.enifl33fi.lab1.api.model.user.User;
 import com.enifl33fi.lab1.api.repository.EmailOtpRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -14,6 +15,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Log4j2
 public class EmailService {
     private final JavaMailSender javaMailSender;
     private final EmailOtpRepository emailOtpRepository;
@@ -21,7 +23,6 @@ public class EmailService {
     @Value("${spring.mail.username}")
     private String fromMail;
 
-    @Async
     public void sendEmail(User user) {
         EmailOtp emailOtp = new EmailOtp(user);
         Optional<EmailOtp> emailOtpOptional = emailOtpRepository.findByUser(user);
@@ -36,6 +37,16 @@ public class EmailService {
         email.setSubject("Confirmation code");
         email.setText(emailOtp.getConfirmationToken());
 
-        javaMailSender.send(email);
+        sendMessage(email);
+    }
+
+    @Async
+    protected void sendMessage(SimpleMailMessage message) {
+        try {
+            javaMailSender.send(message);
+            log.info("Email sent successfully to: {}", message.getTo());
+        } catch (Exception e) {
+            log.error("Failed to send email: {}", e.getMessage(), e);
+        }
     }
 }

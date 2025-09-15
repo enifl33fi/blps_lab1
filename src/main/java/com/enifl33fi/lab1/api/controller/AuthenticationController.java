@@ -1,9 +1,11 @@
 package com.enifl33fi.lab1.api.controller;
 
 import com.enifl33fi.lab1.api.dto.request.AuthRequestDto;
-import com.enifl33fi.lab1.api.dto.request.RefreshJwtRequestDto;
-import com.enifl33fi.lab1.api.dto.response.AuthResponseDto;
+import com.enifl33fi.lab1.api.model.security.EmailOtp;
+import com.enifl33fi.lab1.api.model.user.User;
+import com.enifl33fi.lab1.api.repository.EmailOtpRepository;
 import com.enifl33fi.lab1.api.service.AuthenticationService;
+import com.enifl33fi.lab1.api.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +14,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
+import java.util.HashMap;
 
 @Tag(
         name = "Authentication controller",
@@ -22,15 +26,17 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class AuthenticationController {
     private final AuthenticationService authenticationService;
+    private final EmailOtpRepository emailOtpRepository;
+    private final UserService userService;
 
     @Operation(
             summary = "User registration",
             description = "Registration ONLY for users"
     )
     @PostMapping("/register")
-    @ResponseBody
-    public ResponseEntity<AuthResponseDto> register(@RequestBody AuthRequestDto userDto) {
-        return ResponseEntity.ok(authenticationService.register(userDto));
+    public ResponseEntity<Void> register(@RequestBody AuthRequestDto userDto) {
+        authenticationService.register(userDto);
+        return ResponseEntity.ok().build();
     }
 
     @Operation(
@@ -38,9 +44,9 @@ public class AuthenticationController {
             description = "Allows to log in"
     )
     @PostMapping("/login")
-    @ResponseBody
-    public ResponseEntity<AuthResponseDto> login(@RequestBody AuthRequestDto userDto) {
-        return ResponseEntity.ok(authenticationService.login(userDto));
+    public ResponseEntity<Void> login(@RequestBody AuthRequestDto userDto) {
+        authenticationService.login(userDto);
+        return ResponseEntity.ok().build();
     }
 
     @Operation(
@@ -48,31 +54,39 @@ public class AuthenticationController {
             description = "Allows to confirm email by providing otp from message"
     )
     @PostMapping("/confirm/{otp}")
-    @ResponseBody
-    public ResponseEntity<AuthResponseDto> confirm(@PathVariable String otp) {
-        return ResponseEntity.ok(authenticationService.confirmAccount(otp));
+    public ResponseEntity<Void> confirm(@PathVariable String otp) {
+        authenticationService.confirmAccount(otp);
+        return ResponseEntity.ok().build();
     }
 
-    @Operation(
-            summary = "Receiving accept and refresh token",
-            description = "Allows to receive new accept and refresh token"
-    )
-    @PostMapping("/refresh")
-    @ResponseBody
-    public ResponseEntity<AuthResponseDto> getTokens(
-            @RequestBody RefreshJwtRequestDto request) {
-        return ResponseEntity.ok(authenticationService.getTokens(request.getRefreshToken()));
-    }
-
-    @Operation(
-            summary = "Is email unique",
-            description = "Allows to get information about uniqueness of email"
-    )
     @GetMapping("/unique")
-    @ResponseBody
-    public ResponseEntity<Map<String, Boolean>> isUserUnique(
-            @RequestParam("email") String email) {
+    public ResponseEntity<Map<String, Boolean>> isUserUnique(@RequestParam("email") String email) {
         Boolean isUnique = authenticationService.isUserUnique(email);
         return ResponseEntity.ok(Collections.singletonMap("unique", isUnique));
+    }
+
+    @GetMapping("/otp/{email}")
+    public ResponseEntity<Map<String, Object>> getOtpForEmail(@PathVariable String email) {
+        try {
+            // Find user by email first
+            User user = userService.loadUserByUsername(email);
+            // Then find OTP for this user
+            Optional<EmailOtp> emailOtp = emailOtpRepository.findByUser(user);
+            
+            Map<String, Object> response = new HashMap<>();
+            if (emailOtp.isPresent()) {
+                response.put("otp", emailOtp.get().getConfirmationToken());
+                response.put("email", email);
+                response.put("message", "OTP found");
+            } else {
+                response.put("message", "No OTP found for this email");
+            }
+            
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("error", e.getMessage());
+            return ResponseEntity.badRequest().body(response);
+        }
     }
 }
